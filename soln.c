@@ -44,6 +44,9 @@ int GetParamRedirect(char *argv[])
         perror("Failure to read an integer input from STDIN!");
         return 0;
     }
+    if (close(STDIN_FILENO) < 0) {
+        perror("Failure closing file!");
+    };
     return input;
 }
 
