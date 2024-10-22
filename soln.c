@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <signal.h>
@@ -17,7 +18,18 @@ int GetParamExec(char *argv[])
      *      + hint: use index 2
      *      + hint: use strtol not atoi, atoi can be unsafe here
      */
-    return 0;
+    char* input_str = argv[2];
+    char* endptr;
+    errno = 0;
+
+    int input = strtol(input_str, &endptr, 10);
+    if (errno == ERANGE || endptr == argv[2]) {
+        perror("Wasn't able to parse long integer from input!");
+        return 0;
+    }
+    else {
+        return input;
+    }
 }
 
 int GetParamRedirect(char *argv[])
@@ -26,7 +38,12 @@ int GetParamRedirect(char *argv[])
      * TODO => Change B:
      *      + Retrieve the parameter by reading (scanf) from STDIN
      */
-    return 0;
+    int input;
+    if (scanf("%d", &input) != 1) {
+        perror("Failure to read an integer input from STDIN!");
+        return 0;
+    }
+    return input;
 }
 
 int GetParamPipe(char *argv[])
@@ -39,7 +56,23 @@ int GetParamPipe(char *argv[])
      *        in RunSoln_Pipe
      */
 
-    return 0;
+    char* pipe_read_end = argv[2];
+    char* endptr;
+    errno = 0;
+
+    int read_fd = strtol(pipe_read_end, &endptr, 10);
+    if (errno == ERANGE || endptr == argv[2]) {
+        perror("Wasn't able to parse long integer from input!");
+        return 0;
+    }
+
+    int input_param;
+
+    if (read(read_fd, &input_param, 1) < 0) {
+        perror("Failed to read from pipe!");
+    }
+
+    return input_param;
 }
 
 // Simple hash function (djb2)
