@@ -47,6 +47,10 @@ static void RedirectSolnOutput(SolnDataT *SolnData) {
     perror("Couldn't redirect STDOUT!");
   };
 
+  if (close(output_fd) < 0) {
+    perror("Error closing inital output file");
+  }
+
   return;
 }
 
@@ -103,12 +107,9 @@ static void NO_RETURN RunSoln_Redirect(SolnDataT *SolnData) {
     perror("Error redirecting STDIN!");
   }
 
-  int input;
-  if (scanf("%d", &input) != 1) {
-    perror("[TEST] Failure to read an integer input from STDIN!");
+  if (close(input_fd) < 0) {
+    perror("Error closing inital fd");
   }
-
-  printf("[TEST] input: %d\n", input);
 
   /* ------------------------------ PROVIDED CODE -----------------------------
    */

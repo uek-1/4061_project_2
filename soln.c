@@ -39,14 +39,12 @@ int GetParamRedirect(char *argv[])
      *      + Retrieve the parameter by reading (scanf) from STDIN
      */
     int input;
-    if (scanf("%d", &input) != 1) {
-        printf("input: %d\n", input);
+    int x; 
+    if ( (x = scanf("%d", &input)) < 0) {
+        printf("x : %d input: %d\n", x, input);
         perror("Failure to read an integer input from STDIN!");
         return 0;
     }
-    // if (close(STDIN_FILENO) < 0) {
-    //     perror("Failure closing file!");
-    // };
     return input;
 }
 
