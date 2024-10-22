@@ -40,6 +40,7 @@ int GetParamRedirect(char *argv[])
      */
     int input;
     if (scanf("%d", &input) != 1) {
+        printf("input: %d\n", input);
         perror("Failure to read an integer input from STDIN!");
         return 0;
     }

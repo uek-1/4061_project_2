@@ -40,7 +40,7 @@ static void RedirectSolnOutput(SolnDataT *SolnData)
     int output_fd = open(SolnData->OutputFilePath, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 
     if (output_fd < 0) {
-       perrror("Couldn't open output file for solution!");
+       perror("Couldn't open output file for solution!");
     }
     else {
         dup2(output_fd, 0);
@@ -84,6 +84,17 @@ static void NO_RETURN RunSoln_Redirect(SolnDataT *SolnData)
      *      + Open that file and redirect STDIN to use that file
      */
 
+    char input_file_path[50];
+    sprintf(input_file_path, "%s/%d.in", INPUT_DIRECTORY_PATH, SolnData->InputParam);
+
+    int input_fd = open(input_file_path, O_RDONLY, 0644);
+    if (input_fd < 0) {
+        perror("Couldn't open fd!");
+    }
+
+    if (dup2(input_fd, STDIN_FILENO) < 0) {
+        perror("Error redirecting STDIN!");
+    }
 
 
 
@@ -117,10 +128,19 @@ static void NO_RETURN RunSoln_Pipe(SolnDataT *SolnData)
      *      + Allow the provided code to pass the file descriptor of the pipe read end to the soln proc
      */
 
+    if (pipe(pipefds) < 0) {
+        perror("error creating pipe!");
+    }
 
+    if (write(pipefds[PIPE_WRITE_END], &SolnData->InputParam, 1) < 0) {
+        perror("Error writing to pipe!");
+    }
 
+    if (close(pipefds[PIPE_WRITE_END]) < 0) {
+        perror("Error closing pipe");
+    }
 
-    
+   
 
     /* ------------------------------ PROVIDED CODE ----------------------------- */
 
