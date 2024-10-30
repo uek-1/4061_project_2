@@ -193,17 +193,17 @@ static void StuckProcessTimerHandler(int signum) {
    * WaitBatch. Specifically the for loop.
    */
 
-  if (signum == SIGALRM) {
+  if (signum == SIGALRM) { //check to make sure alarm
     for (int i = 0; i < SolnDataArr.Count; i++) {
-    SolnDataT *soln_data = &SolnDataArr.Array[i];
+    SolnDataT *soln_data = &SolnDataArr.Array[i]; // loop processes
 
         // Check if process is still in progress
     if (soln_data->WaitStatus == IN_PROGRESS_WAIT_STATUS) {
-      if (kill(soln_data->pid, SIGKILL) == -1) {
+      if (kill(soln_data->pid, SIGKILL) == -1) { // error
         perror("Error killing stuck process");
       } else {
         printf("Killed stuck process with PID: %d\n", soln_data->pid);
-        soln_data->WaitStatus = SIGKILL;
+        soln_data->WaitStatus = SIGKILL; // successfully killed process
       }
     }
   }
@@ -230,15 +230,15 @@ static void StartStuckProcessTimer(void) {
   timeval.it_value.tv_sec = STUCK_PROC_TIMER_VALUE_SEC;
   timeval.it_value.tv_usec = STUCK_PROC_TIMER_VALUE_USEC;
   timeval.it_interval.tv_sec = 0;
-  timeval.it_interval.tv_usec = 0;
+  timeval.it_interval.tv_usec = 0; // set timer values to 0
 
   struct sigaction sa;
   sa.sa_handler = StuckProcessTimerHandler;
-  sigemptyset(&sa.sa_mask);
+  sigemptyset(&sa.sa_mask); // set flags to 0
   sa.sa_flags = 0;
 
   if (sigaction(SIGALRM, &sa, NULL) == -1) {
-    perror("Error setting up SIGALRM handler");
+    perror("Error setting up SIGALRM handler"); // apply signal handler
     exit(EXIT_FAILURE);
   }
 
@@ -270,7 +270,7 @@ static void CancelStuckProcessTimer(void) {
 
   if (setitimer(ITIMER_REAL, &timeval, NULL) == -1) {
     perror("Error cancelling stuck process timer");
-    exit(EXIT_FAILURE);
+    exit(EXIT_FAILURE); // error handling
   }
 
   return;
