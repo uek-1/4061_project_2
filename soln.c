@@ -40,13 +40,9 @@ int GetParamRedirect(char *argv[])
      */
     int input;
     if (scanf("%d", &input) != 1) {
-        printf("input: %d\n", input);
         perror("Failure to read an integer input from STDIN!");
-        return 0;
+        exit(EXIT_FAILURE);
     }
-    // if (close(STDIN_FILENO) < 0) {
-    //     perror("Failure closing file!");
-    // };
     return input;
 }
 
@@ -65,16 +61,22 @@ int GetParamPipe(char *argv[])
     errno = 0;
 
     int read_fd = strtol(pipe_read_end, &endptr, 10);
-    if (errno == ERANGE || endptr == argv[2]) {
+    if (errno != 0 || endptr == argv[2]) {
         perror("Wasn't able to parse long integer from input!");
         return 0;
     }
 
     int input_param;
 
-    if (read(read_fd, &input_param, 1) < 0) {
+    if (read(read_fd, &input_param, sizeof(input_param)) <= 0) {
         perror("Failed to read from pipe!");
     }
+
+    if (close(read_fd) < 0) {
+        perror("Error closing read end of pipe");
+    }
+
+    printf("input %d", input_param);
 
     return input_param;
 }

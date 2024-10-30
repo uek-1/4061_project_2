@@ -106,12 +106,7 @@ static void NO_RETURN RunSoln_Redirect(SolnDataT *SolnData) {
     perror("Error redirecting STDIN!");
   }
 
-  int input;
-  if (scanf("%d", &input) != 1) {
-    perror("[TEST] Failure to read an integer input from STDIN!");
-  }
 
-  printf("[TEST] input: %d\n", input);
 
   /* ------------------------------ PROVIDED CODE -----------------------------
    */
@@ -148,7 +143,7 @@ static void NO_RETURN RunSoln_Pipe(SolnDataT *SolnData) {
     perror("error creating pipe!");
   }
 
-  if (write(pipefds[PIPE_WRITE_END], &SolnData->InputParam, 1) < 0) {
+  if (write(pipefds[PIPE_WRITE_END], &SolnData->InputParam, sizeof(SolnData->InputParam)) < 0) {
     perror("Error writing to pipe!");
   }
 
@@ -204,12 +199,11 @@ static void StuckProcessTimerHandler(int signum) {
 
         // Check if process is still in progress
     if (soln_data->WaitStatus == IN_PROGRESS_WAIT_STATUS) {
-      int waitpid_status = 0;
       if (kill(soln_data->pid, SIGKILL) == -1) {
         perror("Error killing stuck process");
       } else {
         printf("Killed stuck process with PID: %d\n", soln_data->pid);
-        soln_data->WaitStatus = waitpid_status;
+        soln_data->WaitStatus = SIGKILL;
       }
     }
   }
@@ -423,11 +417,15 @@ static void WaitBatch(void) {
         soln_data->WaitStatus = waitpid_status;
         exited_count++;
       }
+      else if (soln_data->WaitStatus == SIGKILL) {
+        // Killed because stuck.
+        exited_count++;
+      }
     }
   }
 
   /* Cancel the stuck process timer... */
-  StuckProcessTimerCancel();
+  CancelStuckProcessTimer();
 
   return;
 }
