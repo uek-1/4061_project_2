@@ -11,3 +11,8 @@ Team id: P1 Group 49
 Team member names: Cameron Nagle, Vivek Kethineni, Aaron Meyerhofer
 
 X500’s: nagle118, kethi012, meye3630
+
+Contribution by each member of the team:
+Cameron Nagle: Worked on change D with Aaron on Start/Cancel StuckProcessTimer and its handler. Plus the readme.
+Vivek Kethineni: Worked on change B exec redirect and pipe/C RedirectSolnOutput(SolnDataT)
+Aaron Meyehofer: Worked on change B exec redirect and pipe/D Start/Cancel StuckProcessTimer and its handler
